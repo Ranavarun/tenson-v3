@@ -33,7 +33,7 @@ jobs:
           context: .
           dockerfile: DockerFile
           push: false
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/tenson-v3:today
+          tags: ${{ Secrets.DOCKER_HUB_USERNAME }}/tenson-v3:today
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
