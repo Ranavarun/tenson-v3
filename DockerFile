@@ -1,9 +1,27 @@
-FROM openjdk:17-jdk
+# Step 1: Build the application with Maven
+FROM maven:3.8.4-openjdk-17 AS builder
 
+# Set the working directory in the container
 WORKDIR /app
 
-COPY target/demo-0.0.1-SNAPSHOT.jar /app/demo-0.0.1-SNAPSHOT.jar
+# Copy the Maven project files to the container
+COPY pom.xml .
+COPY src ./src
 
+# Build the Spring Boot application (skip tests to speed up the build if not needed)
+RUN mvn clean package -DskipTests
+
+# Step 2: Use a lightweight JDK image to run the application
+FROM openjdk:17-jdk-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the JAR file from the builder stage
+COPY --from=builder /app/target/demo-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose port 8080 for the application
 EXPOSE 8080
 
-CMD ["java", "-jar", "springdemo.jar"]
+# Set the command to run the JAR file
+ENTRYPOINT ["java", "-jar", "app.jar"]
